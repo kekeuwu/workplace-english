@@ -255,6 +255,7 @@ p{margin:0}
 .routine{background:var(--card);border:2px solid var(--ink);border-radius:var(--r-lg);box-shadow:var(--sticker);padding:16px 20px;margin-bottom:32px}
 .routine b{display:block;font-size:14px;margin-bottom:10px}
 .routine-bar{display:flex;gap:4px}
+.routine-bar small{font-size:inherit;margin-left:.6em}
 .routine-bar span{flex:0 0 calc(var(--w) - 4px);background:var(--butter);border-radius:8px;padding:6px 4px;text-align:center;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden}
 .routine-bar span:nth-child(1){background:var(--butter)}.routine-bar span:nth-child(2){background:var(--cherry);color:#fff}.routine-bar span:nth-child(3){background:var(--mint)}
 .method-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
@@ -280,7 +281,8 @@ p{margin:0}
   .method-art{order:-1}.method-art .mascot-img{max-width:110px}
   .method-step{padding:16px;gap:12px}
   .m-num{width:36px;height:36px;font-size:17px}
-  .routine-bar span{font-size:11px}
+  .routine-bar span{font-size:12px;line-height:1.35;white-space:normal}
+  .routine-bar small{display:block;margin-left:0;font-weight:500}
 }
 
 /* favorites */
@@ -374,6 +376,10 @@ footer{max-width:1000px;margin:0 auto;padding:0 20px 40px;font-size:13px;color:v
   .today .day-big{font-size:30px}
   .top-in{padding:10px 16px}
   .brand small{display:none}
+  .top{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}
+  .unit{padding:18px 16px}
+  .unit-head{flex-direction:column;align-items:flex-start;gap:10px}
+  .unit-head svg{width:52px;height:52px}
   .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:2px solid var(--ink);justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
   .nav a{flex-direction:column;gap:0;font-size:12px;padding:4px 10px;border-radius:12px}
   .nav a svg{width:22px;height:22px}
@@ -2009,7 +2015,7 @@ function renderMethod(){
   </section>
   <div class="routine reveal" style="--i:1">
     <b>每天 10 分鐘這樣分配</b>
-    <div class="routine-bar"><span style="--w:20%">聽懂　2 分鐘</span><span style="--w:50%">跟讀 Shadowing　5 分鐘</span><span style="--w:30%">練習產出　3 分鐘</span></div>
+    <div class="routine-bar"><span style="--w:20%">聽懂<small>2 分鐘</small></span><span style="--w:50%">跟讀 Shadowing<small>5 分鐘</small></span><span style="--w:30%">練習產出<small>3 分鐘</small></span></div>
   </div>
   <ol class="method-steps">${METHOD.map((m,i)=>`
     <li class="method-step">

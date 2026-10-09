@@ -264,9 +264,9 @@ p{margin:0}
 .method-step:nth-child(1) .m-num{background:var(--butter);color:var(--ink)}
 .method-step:nth-child(3) .m-num{background:var(--mint);color:var(--ink)}
 .m-body{flex:1;min-width:0}
-.m-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.m-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
 .m-time{font-size:12px;font-weight:700;color:var(--crust);background:var(--bg);border-radius:999px;padding:1px 10px}
-.m-en{font-size:13px;color:var(--muted);font-weight:700;margin-top:2px}
+.m-en{font-size:13px;color:var(--muted);font-weight:700}
 .m-why{margin:8px 0}
 .m-how{margin:0 0 10px;padding-left:1.2em}
 .m-how li{margin:3px 0}
@@ -2021,8 +2021,8 @@ function renderMethod(){
     <li class="method-step">
       <div class="m-num">${i+1}</div>
       <div class="m-body">
-        <div class="m-head"><h2>${esc(m.t)}</h2><span class="m-time">${esc(m.time)}</span></div>
-        <div class="m-en">${esc(m.en)}</div>
+        <h2>${esc(m.t)}</h2>
+        <div class="m-meta"><span class="m-en">${esc(m.en)}</span><span class="m-time">${esc(m.time)}</span></div>
         <p class="m-why">${esc(m.why)}</p>
         <ul class="m-how">${m.how.map(h=>`<li>${esc(h)}</li>`).join("")}</ul>
         ${i===2?`<div class="ai-prompt"><div class="ai-top"><b>AI 提示詞（可直接複製貼給 AI）</b><button class="btn ghost sm" data-copy>複製</button></div><pre id="aiPrompt">${esc(AI_PROMPT)}</pre></div>`:""}

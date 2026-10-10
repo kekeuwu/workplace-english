@@ -6,10 +6,7 @@
 
 免費、不用註冊、打開就能用，手機和電腦都適用。
 
-<p>
-  <img src="docs/preview-desktop.png" alt="網站首頁" width="62%">
-  <img src="docs/preview-dialogue.png" alt="情境對話頁面" width="28%">
-</p>
+![網站首頁](docs/preview-desktop.png)
 
 ---
 

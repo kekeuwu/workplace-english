@@ -80,6 +80,22 @@ English Learning/
 - **動畫**：換頁淡入、卡片與按鈕的彈跳回饋、課程頁內容隨捲動出現（Q 彈效果，已出現的不會再消失）、收藏和完成時的糖粒特效。系統開啟「減少動態效果」時會自動關閉。
 - **手機版**：導覽列移到底部，首頁文字置中，版面單欄。
 
+### 流量分析（Google Analytics）
+
+- 評估 ID：`G-M7FM0E9GG3`，追蹤碼在 `index.html` 的 `<head>`。
+- 網站用 `#` 切換頁面，所以頁面瀏覽改由程式在每次換頁時送出（`trackPage`），報表裡每一課會是獨立的頁面，例如 `/workplace-english/day/11`。
+- GA 後台要關掉「加強型評估 → 根據瀏覽記錄事件變更網頁」，避免同一次換頁被算兩次。
+- 自訂事件：
+
+| 事件 | 觸發時機 | 參數 |
+| --- | --- | --- |
+| `play_audio` | 按喇叭或「播放整段」 | `mode`（single / all）、`lesson` |
+| `lesson_complete` | 讀到 90% 或手動標記完成 | `lesson`、`method`（scroll / manual） |
+| `lesson_uncomplete` | 手動取消完成 | `lesson` |
+| `reveal_answer` | 延伸小練習點「點我看答案」 | `lesson` |
+| `favorite` | 點星星收藏 | `item_type`、`lesson`、`text` |
+| `copy_prompt` | 複製 AI 提示詞 | — |
+
 ### 資料儲存
 
 收藏、完成進度、閱讀百分比、語音設定都存在瀏覽器的 localStorage，**換裝置或清除瀏覽器資料不會保留**。

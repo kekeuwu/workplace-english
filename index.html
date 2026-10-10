@@ -8,6 +8,14 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#FFFCF3">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M7FM0E9GG3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){ dataLayer.push(arguments); }
+  gtag("js", new Date());
+  gtag("config", "G-M7FM0E9GG3", { send_page_view: false });
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -433,7 +441,7 @@ footer{max-width:1000px;margin:0 auto;padding:0 20px 40px;font-size:13px;color:v
 </header>
 
 <main id="app" tabindex="-1"></main>
-<footer>收藏和學習進度會存在這個瀏覽器裡，換裝置不會同步。</footer>
+<footer>收藏和學習進度會存在這個瀏覽器裡，換裝置不會同步。<br>本網站使用 Google Analytics 分析流量，不會蒐集你的姓名或聯絡方式。</footer>
 
 <div class="modal" id="fcModal" role="dialog" aria-modal="true" aria-label="翻卡複習">
   <div class="fc">
@@ -1884,6 +1892,7 @@ function trackRead(){
   readPct[n] = pct; store.set("mt-read", readPct);
   const chip = $("#doneChip");
   if(pct >= 90 && !done.includes(n) && !undone.includes(n)){
+    track("lesson_complete", {lesson:n, method:"scroll"});
     done = [...done,n]; store.set("mt-done",done);
     if(chip){ chip.setAttribute("aria-pressed","true"); chip.title="點一下取消完成"; }
     sprinkles(bar.parentElement.querySelector(".brand") || bar, 22);
@@ -2098,6 +2107,16 @@ function scrollReveal(){
   document.querySelectorAll("#app "+SR_SEL).forEach(el=>{ el.classList.add("sr"); srObs.observe(el); });
 }
 
+/* analytics: never let tracking break the page */
+function track(name, params){ try{ if(window.gtag) gtag("event", name, params||{}); }catch(e){} }
+const PAGE_TITLE = {home:"首頁", syllabus:"課程大綱", favorites:"收藏", method:"口說學習方法"};
+function trackPage(page, arg){
+  const n = parseInt(arg,10);
+  const title = page==="day" && DAYS[n-1] ? `第 ${n} 課 ${DAYS[n-1].en}` : (PAGE_TITLE[page]||"首頁");
+  const path = page==="day" ? `day/${n}` : (PAGE_TITLE[page]?page:"home");
+  track("page_view", { page_title: `${title}｜職場英文 30 天`, page_location: location.origin + location.pathname + path });
+}
+
 function route(quiet){
   if(quiet!==true){ stopSpeech(); markSpeaking(null); } // leaving the page: stop any audio still playing
   const [page,arg] = (location.hash.slice(1)||"home").split("/");
@@ -2117,24 +2136,26 @@ function route(quiet){
   const cur = document.querySelector(`.nav a[data-page="${nav}"]`); if(cur) cur.setAttribute("aria-current","page");
   if(!(page==="syllabus" && arg) && quiet!==true) window.scrollTo(0,0);
   requestAnimationFrame(trackRead);
+  if(quiet!==true) trackPage(page, arg);
 }
 document.addEventListener("click",e=>{
   const f = e.target.closest("[data-fav]");
   if(f){ const id=f.dataset.fav;
-    if(favs[id]) delete favs[id]; else if(REG[id]) favs[id]=REG[id];
+    if(favs[id]) delete favs[id]; else if(REG[id]){ favs[id]=REG[id]; track("favorite", {item_type:REG[id].type, lesson:REG[id].day, text:String(REG[id].en).slice(0,90)}); }
     store.set("mt-favs",favs);
     if(location.hash.startsWith("#favorites") || id.endsWith("-dlg")) { const y=window.scrollY; route(true); window.scrollTo(0,y); }
     else { const on=!!favs[id]; f.setAttribute("aria-pressed",on); f.setAttribute("aria-label",on?"取消收藏":"加入收藏"); replay(f,"pop"); if(on) sprinkles(f,8); }
     return; }
   const cp = e.target.closest("[data-copy]");
-  if(cp){ const done = ()=>{ cp.textContent="已複製！"; replay(cp,"jelly"); setTimeout(()=>cp.textContent="複製",1600); };
+  if(cp){ track("copy_prompt"); const done = ()=>{ cp.textContent="已複製！"; replay(cp,"jelly"); setTimeout(()=>cp.textContent="複製",1600); };
     navigator.clipboard ? navigator.clipboard.writeText(AI_PROMPT).then(done, ()=>{ const r=document.createRange(); r.selectNodeContents($("#aiPrompt")); getSelection().removeAllRanges(); getSelection().addRange(r); }) : null; return; }
   const rv = e.target.closest("[data-reveal]");
-  if(rv){ const line = rv.closest(".line"); line.classList.add("open"); replay(line.querySelector(".bubble"),"answer-in"); sprinkles(line.querySelector(".bubble"), 10); return; }
-  const s = e.target.closest("[data-say]"); if(s){ speak(s.dataset.say, s.dataset.who, s); return; }
-  const sa = e.target.closest("[data-sayall]"); if(sa){ speakLines(LESSONS[sa.dataset.sayall].dialogue.map(l=>[l[0],l[1]]), sa); return; }
+  if(rv){ const line = rv.closest(".line"); line.classList.add("open"); track("reveal_answer", {lesson:curLesson}); replay(line.querySelector(".bubble"),"answer-in"); sprinkles(line.querySelector(".bubble"), 10); return; }
+  const s = e.target.closest("[data-say]"); if(s){ speak(s.dataset.say, s.dataset.who, s); track("play_audio", {mode:"single", lesson:curLesson}); return; }
+  const sa = e.target.closest("[data-sayall]"); if(sa){ track("play_audio", {mode:"all", lesson:+sa.dataset.sayall}); speakLines(LESSONS[sa.dataset.sayall].dialogue.map(l=>[l[0],l[1]]), sa); return; }
   const d = e.target.closest("[data-done]");
   if(d){ const n=+d.dataset.done, finishing=!done.includes(n); done = finishing?[...done,n]:done.filter(x=>x!==n); store.set("mt-done",done);
+    track(finishing?"lesson_complete":"lesson_uncomplete", {lesson:n, method:"manual"});
     undone = finishing?undone.filter(x=>x!==n):[...undone,n]; store.set("mt-undone",undone);
     const y=window.scrollY; route(true); window.scrollTo(0,y);
     if(finishing){ const c=document.querySelector(".done-chip"); if(c){ sprinkles(c,18); replay(c,"jelly"); } }
